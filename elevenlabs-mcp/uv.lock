@@ -310,6 +310,7 @@ source = { editable = "." }
 dependencies = [
     { name = "elevenlabs" },
     { name = "fastapi" },
+    { name = "fastmcp" },
     { name = "fuzzywuzzy" },
     { name = "httpx" },
     { name = "mcp", extra = ["cli"] },
@@ -337,6 +338,7 @@ requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.0.3" },
     { name = "elevenlabs", specifier = ">=2.1.0" },
     { name = "fastapi", specifier = "==0.109.2" },
+    { name = "fastmcp", specifier = ">=0.4.1" },
     { name = "fastmcp", marker = "extra == 'dev'", specifier = "==0.4.1" },
     { name = "fuzzywuzzy", specifier = "==0.18.0" },
     { name = "httpx", specifier = "==0.28.1" },
