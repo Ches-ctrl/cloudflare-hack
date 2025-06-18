@@ -9,15 +9,49 @@ import type { Chat } from "./server";
 import { getCurrentAgent } from "agents";
 import { unstable_scheduleSchema } from "agents/schedule";
 
+// Type definition for weather data
+interface WeatherData {
+  location: string;
+  temperature: {
+    celsius: number;
+    fahrenheit: number;
+  };
+  condition: string;
+  humidity: number;
+  windSpeed: number;
+  timestamp: string;
+}
+
 /**
- * Weather information tool that requires human confirmation
- * When invoked, this will present a confirmation dialog to the user
- * The actual implementation is in the executions object below
+ * Weather information tool that fetches real weather data from the API
+ * This tool executes automatically since it's a simple API call
  */
 const getWeatherInformation = tool({
-  description: "show the weather in a given city to the user",
-  parameters: z.object({ city: z.string() }),
-  // Omitting execute function makes this tool require human confirmation
+  description: "Get the current weather information for a specific location",
+  parameters: z.object({
+    city: z.string().describe("The city name to get weather for (e.g., 'London', 'New York', 'Tokyo')")
+  }),
+  execute: async ({ city }) => {
+    try {
+      const response = await fetch(`https://4db625969f045f2bd2cfd339.fp.dev/test/current/${encodeURIComponent(city)}`);
+
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status} ${response.statusText}`);
+      }
+
+      const weatherData = await response.json() as WeatherData;
+
+      return `Weather in ${weatherData.location}:
+• Temperature: ${weatherData.temperature.celsius}°C (${weatherData.temperature.fahrenheit}°F)
+• Condition: ${weatherData.condition}
+• Humidity: ${weatherData.humidity}%
+• Wind Speed: ${weatherData.windSpeed} m/s
+• Last Updated: ${new Date(weatherData.timestamp).toLocaleString()}`;
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      return `Sorry, I couldn't fetch weather data for ${city}. Please try again later.`;
+    }
+  },
 });
 
 /**
@@ -221,8 +255,5 @@ export const tools = {
  * Each function here corresponds to a tool above that doesn't have an execute function
  */
 export const executions = {
-  getWeatherInformation: async ({ city }: { city: string }) => {
-    console.log(`Getting weather information for ${city}`);
-    return `The weather in ${city} is sunny`;
-  },
+  // getWeatherInformation is now handled directly in the tool definition above
 };
